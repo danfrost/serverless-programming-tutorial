@@ -1,0 +1,57 @@
+# See README.md
+
+service: LXF3
+
+provider:
+  name: aws
+  runtime: python2.7
+  profile: tutorial-profile
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource: "arn:aws:s3:::dropbucketlxf/*"
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:PutItem"
+        - "dynamodb:GetItem"
+        - "dynamodb:BatchWriteItem"
+        - "dynamodb:Scan"
+        - "dynamodb:UpdateItem"
+        - "dynamodb:DescribeTable"
+      Resource: "arn:aws:dynamodb:us-east-1:*:table/badones"
+
+functions:
+  hello:
+    handler: handler.hello
+  upload:
+    handler: handler.upload
+    events:
+      - http:
+          path: upload
+          method: post
+  scan:
+    handler: handler.scan
+    events:
+      - s3:
+          bucket: dropbucketlxf
+          event: s3:ObjectCreated:*
+
+resources:
+  Resources:
+    BadOnesDB:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: 'badones'
+        KeySchema:
+          -
+            AttributeName: line
+            KeyType: HASH
+        AttributeDefinitions:
+          -
+            AttributeName: line
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
