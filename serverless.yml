@@ -38,6 +38,14 @@ functions:
           bucket: dropbucketlxf
           event: s3:ObjectCreated:*
 
+  auth:
+      handler: handler.get_bad_lines
+      events:
+        - http:
+            path: get_bad_lines
+            method: get
+
+
 resources:
   Resources:
     BadOnesDB:
