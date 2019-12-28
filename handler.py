@@ -76,8 +76,9 @@ def scan(event, context):
 def get_bad_lines(event, context):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('accounts')
-    Items = table.scan()
-    return {
-        responseCode: 200,
-        body: json.dumps(items)
+    items = table.scan()
+    response = {
+        "responseCode": 200,
+        "body": json.dumps(items)
     }
+    return response
